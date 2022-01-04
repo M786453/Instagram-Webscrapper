@@ -4,12 +4,9 @@ import openpyxl
 
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.chrome.options import Options
 
+URL = "https://www.instagram.com/"
 
 wb = openpyxl.load_workbook("followers.xlsx")
 
@@ -35,8 +32,6 @@ for sheet in sheets:
 
 driver = webdriver.Chrome("./chromedriver_win32/chromedriver.exe")
 
-driver.get("https://www.instagram.com/home/")
-
 for sheet in sheet_followers_dict:
 
     followers = sheet_followers_dict[sheet]
@@ -45,24 +40,11 @@ for sheet in sheet_followers_dict:
 
         for f in range(0, len(followers)):
 
-            search = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Search']")))
-
-            search.clear()
-
-            search.send_keys(followers[f])
-
-            time.sleep(5)
-
-            search.send_keys(Keys.ENTER)
-
-            time.sleep(5)
-
-            search.send_keys(Keys.ENTER)
+            driver.get(URL + followers[f])
 
             try:
                 time.sleep(5)
-                driver.find_element_by_class_name("rkEop")
+                driver.find_element(By.CLASS_NAME, "rkEop")
                 wb[sheet]["B" + str(f + 1)] = "Account is Private"  # writing account status in excel file
                 print(followers[f] + "'s Account is Private")
             except NoSuchElementException:
